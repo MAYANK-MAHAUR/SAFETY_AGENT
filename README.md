@@ -62,7 +62,7 @@ This test case specifically challenges the agent to classify the intent as **`sc
     },
     "query": {
         "id": "01K6BEMZ2QZQ58ADNDCKBPKD51",
-        "prompt": "is this safe? hianime.to and youtube.com",
+        "prompt": "is this safe? hianime.to",
         "context": ""
     }
 }
@@ -87,3 +87,4 @@ Phase 2 will focus on expanding the agent's scope, intelligence, and performance
 | **Parallel Execution** | Dramatically reduce latency when scanning multiple targets or querying multiple APIs. | Implement Python's `asyncio` or `threading/multiprocessing` to run simultaneous network requests (e.g., scan 5 URLs concurrently). |
 | **Conclusion/Verdict Engine** | Create a final module that takes conflicting results from multiple APIs and provides a definitive, final verdict based on weighted evidence. | Develop a scoring engine (e.g., Bayes theorem) that intelligently combines all parallel data for the final risk assessment. |
 | **Persistence & DB** | Replace the current in-memory `scan_results` with a simple database (e.g., SQLite) for permanent history storage. | Update `memory.py` functions to use a database for persistent logging. |
+
