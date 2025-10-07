@@ -1,7 +1,3 @@
-This is a comprehensive approach\! A detailed `README.md` is essential for onboarding new users or developers.
-
-Here is the enhanced `README.md` for the **Guardian Sentinel** agent, including the architectural deep dive, the GitHub repository link, and the dedicated Postman testing section with your provided JSON payload.
-
 # 🛡️ Guardian Sentinel Agent
 
 ## Overview
@@ -94,3 +90,4 @@ This test case challenges the LLM to classify intent and extract URLs from a com
 -----
 
 *Note: To test **File Scanning**, you must use the official Sentient Chat UI to upload a file, as the request payload will automatically include the required `file_ids` list, which cannot be reliably faked in a simple Postman call.*
+
