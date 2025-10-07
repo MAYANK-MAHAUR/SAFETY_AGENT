@@ -72,7 +72,7 @@ This test case challenges the LLM to classify intent and extract URLs from a com
     },
     "query": {
         "id": "01K6BEMZ2QZQ58ADNDCKBPKD51",
-        "prompt": "is this safe? hianime.to and youtube.com",
+        "prompt": "is this site safe? hianime.to"
         "context": ""
     }
 }
@@ -90,4 +90,5 @@ This test case challenges the LLM to classify intent and extract URLs from a com
 -----
 
 *Note: To test **File Scanning**, you must use the official Sentient Chat UI to upload a file, as the request payload will automatically include the required `file_ids` list, which cannot be reliably faked in a simple Postman call.*
+
 
