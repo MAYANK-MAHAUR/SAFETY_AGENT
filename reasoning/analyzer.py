@@ -6,7 +6,6 @@ def generate_advice(item_type, item, risk, verdict):
     Generate detailed human-like reasoning and security advice based on item history.
     """
     context = ""
-    # Reference past similar items
     similar_items = [r for r in scan_results if r["type"]==item_type]
     if similar_items:
         context = f"Previously scanned {len(similar_items)} {item_type}(s) with similar characteristics."
