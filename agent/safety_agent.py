@@ -1,78 +1,52 @@
 from sentient_agent_framework import AbstractAgent, ResponseHandler
 from .vt_scan import scan_url, scan_file
-from .memory import scan_results, log_scan
-from reasoning.analyzer import generate_advice
-
+from .query_processor import process_query
+from .post_processor import post_process_response
 
 class SafetyAgent(AbstractAgent):
     async def assist(self, session, query, response_handler: ResponseHandler):
-        msg = query.prompt.lower().strip()
+        
+        try:
+            first_part = query.content.request_payload.parts[0]
+            prompt = first_part.prompt
+            file_ids = first_part.files_ids
+        except (AttributeError, IndexError, TypeError):
+            prompt = query.prompt
+            file_ids = []
 
-        if msg.startswith("scan url"):
-            url = msg[9:].strip()
-            risk, verdict = scan_url(url)
-            await response_handler.emit_text_block(
-                event_name="scan_result",
-                content=f"URL Scan Completed: Risk {risk}%, Verdict: {verdict}"
-            )
-            advice = generate_advice("URL", url, risk, verdict)
-            await response_handler.emit_text_block(
-                event_name="scan_advice",
-                content=advice
-            )
+        command_params = process_query(prompt)
+        command = command_params.get("command")
+        target_value = command_params.get("target_value")
+        
+        command_result = command_params
+        
+        if command == "scan":
+            item_type = command_params.get("target_type")
+            
+            if item_type == "url":
+                risk, verdict = scan_url(target_value)
+            
+            elif item_type == "file":
+                
+              
+                potential_identifiers = file_ids if file_ids else [target_value]
 
-        elif msg.startswith("scan file"):
-            path = msg[10:].strip()
-            risk, verdict = scan_file(path)
-            await response_handler.emit_text_block(
-                event_name="scan_result",
-                content=f"File Scan Completed: Risk {risk}%, Verdict: {verdict}"
-            )
-            advice = generate_advice("File", path, risk, verdict)
-            await response_handler.emit_text_block(
-                event_name="scan_advice",
-                content=advice
-            )
-
-        elif msg == "summary":
-            if not scan_results:
-                await response_handler.emit_text_block(
-                    event_name="scan_summary",
-                    content="No scans yet."
-                )
-                return
-            summary_text = "\n".join(
-                [f"{r['type']} {r['item']} → Risk {r['risk']}%, Verdict {r['verdict']}" for r in scan_results]
-            )
-            await response_handler.emit_text_block(
-                event_name="scan_summary",
-                content=f"Scan Summary:\n{summary_text}"
-            )
-
-        elif msg.startswith("advice for"):
-            query_item = msg[10:].strip()
-            matched = [r for r in scan_results if query_item in r["item"]]
-            if matched:
-                for item in matched:
-                    advice = generate_advice(item["type"], item["item"], item["risk"], item["verdict"])
-                    await response_handler.emit_text_block(
-                        event_name="scan_advice",
-                        content=advice
-                    )
+                identifiers_to_scan = [i for i in potential_identifiers if i is not None]
+                
+                if not identifiers_to_scan:
+                    risk, verdict = 0, "Error: File scan requested but no file attached or name provided."
+                    command_result["target_value"] = "N/A"
+                else:
+                    risk, verdict = scan_file(identifiers_to_scan, session) 
+                    command_result["target_value"] = f"Files: {', '.join(identifiers_to_scan)}"
+                
             else:
-                await response_handler.emit_text_block(
-                    event_name="scan_advice",
-                    content="No matching item found in scan history."
-                )
+                risk, verdict = 0, "Error: Unknown scan target type."
 
-        else:
-            await response_handler.emit_text_block(
-                event_name="unknown_command",
-                content=(
-                    "Unknown command. Use:\n"
-                    "- 'scan url <url>'\n"
-                    "- 'scan file <path>'\n"
-                    "- 'summary'\n"
-                    "- 'advice for <item>'"
-                )
-            )
+            command_result.update({"risk": risk, "verdict": verdict})
+        
+        await post_process_response(
+            response_handler,
+            command_result,
+            prompt 
+        )
