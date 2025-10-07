@@ -1,3 +1,7 @@
+This is a comprehensive approach\! A detailed `README.md` is essential for onboarding new users or developers.
+
+Here is the enhanced `README.md` for the **Guardian Sentinel** agent, including the architectural deep dive, the GitHub repository link, and the dedicated Postman testing section with your provided JSON payload.
+
 # 🛡️ Guardian Sentinel Agent
 
 ## Overview
@@ -72,7 +76,7 @@ This test case challenges the LLM to classify intent and extract URLs from a com
     },
     "query": {
         "id": "01K6BEMZ2QZQ58ADNDCKBPKD51",
-        "prompt": "is this site safe? hianime.to"
+        "prompt": "is this safe? hianime.to and youtube.com",
         "context": ""
     }
 }
@@ -83,12 +87,10 @@ This test case challenges the LLM to classify intent and extract URLs from a com
 | Stage | Expected Action | Notes |
 | :--- | :--- | :--- |
 | **Intent (LLM)** | Command classified as **`scan`**, Target Type: **`url`**. | The agent recognizes the security question. |
-| **Extraction** | The LLM will extract **one primary URL** (likely `hianime.to` or `youtube.com`). | *Limitation:* The current phase is designed to extract a single target URL from a prompt. |
+| **Extraction** | The LLM will extract **one primary URL** (likely `hianime.to` | *Limitation:* The current phase is designed to extract a single target URL from a prompt. |
 | **Execution** | `scan_url()` is called with the extracted URL. The VirusTotal and LLM scores are calculated. | The final risk score and verdict are determined. |
 | **Output** | The agent streams the result using `post_processor.py`. | **Output will include:** `agent_status` $\rightarrow$ `scan_result` $\rightarrow$ `scan_advice`. |
 
 -----
 
 *Note: To test **File Scanning**, you must use the official Sentient Chat UI to upload a file, as the request payload will automatically include the required `file_ids` list, which cannot be reliably faked in a simple Postman call.*
-
-
